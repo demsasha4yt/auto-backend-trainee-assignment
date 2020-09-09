@@ -6,6 +6,10 @@ build:
 test:
 	go test -v -race ./...
 
+.PHONY: migrate_up
+migrate_up:
+	migrate -database "postgres://postgres:pass@db/data?sslmode=disable" -path migrations up
+
 
 .DEFAULT_GOAL := build
 

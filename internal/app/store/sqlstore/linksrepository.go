@@ -21,6 +21,7 @@ func (r *LinksRepository) Create(u *models.Links) error {
 	if err := u.Validate(); err != nil {
 		return err
 	}
+	u.AppendHTTP()
 	if err := r.store.db.QueryRow(
 		"INSERT INTO links(shorten_url, original_url) VALUES($1, $2) RETURNING id",
 		shortURLEmpty,

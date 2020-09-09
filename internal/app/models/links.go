@@ -1,6 +1,8 @@
 package models
 
 import (
+	strings "strings"
+
 	"github.com/demsasha4yt/auto-backend-trainee-assignment/internal/app/base62"
 
 	validation "github.com/go-ozzo/ozzo-validation"
@@ -9,9 +11,9 @@ import (
 
 // Links ...
 type Links struct {
-	ID         int64  `json:"id,omitempty"`
+	ID         int64  `json:"-"`
 	URL        string `json:"url,omitempty"`
-	ShortenURL string `json:"short_url,omitempty"`
+	ShortenURL string `json:"shorten_url,omitempty"`
 	CreatedAt  string `json:"created_at,omitempty"`
 }
 
@@ -19,6 +21,13 @@ type Links struct {
 func (s *Links) Validate() error {
 	return validation.ValidateStruct(s,
 		validation.Field(&s.URL, validation.Required, is.URL))
+}
+
+// AppendHTTP appends http if needs
+func (s *Links) AppendHTTP() {
+	if !strings.HasPrefix(strings.ToLower(s.URL), "http") {
+		s.URL = "http://" + s.URL
+	}
 }
 
 // MakeShorten makes shorten url and put in s.ShortenURL
@@ -31,4 +40,10 @@ func (s *Links) MakeID() error {
 	var err error
 	s.ID, err = base62.Decode(s.ShortenURL)
 	return err
+}
+
+// PostProcessing data before respone
+func (s *Links) PostProcessing(hostname string) {
+	s.ShortenURL = hostname + s.ShortenURL
+	s.CreatedAt = ""
 }

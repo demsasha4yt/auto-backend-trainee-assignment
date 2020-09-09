@@ -76,7 +76,8 @@ func (s *server) handleShortenURL() http.HandlerFunc {
 		if err := s.store.Links().Create(l); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 		}
-		s.respond(w, r, http.StatusOK, currentHost+l.ShortenURL)
+		l.PostProcessing(currentHost)
+		s.respond(w, r, http.StatusOK, l)
 	}
 }
 
