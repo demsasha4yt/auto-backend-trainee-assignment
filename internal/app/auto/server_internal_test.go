@@ -8,6 +8,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/demsasha4yt/auto-backend-trainee-assignment/internal/app/models"
 	"github.com/demsasha4yt/auto-backend-trainee-assignment/internal/app/store/sqlstore"
 	"github.com/stretchr/testify/assert"
 )
@@ -70,19 +71,44 @@ func TestServer_handleRedirectBase62(t *testing.T) {
 	defer teardown("links")
 	s := newServer(sqlstore.New(db))
 
+	rec := httptest.NewRecorder()
+	b := &bytes.Buffer{}
+	json.NewEncoder(b).Encode(map[string]string{
+		"url": "google.com",
+	})
+	req, _ := http.NewRequest(http.MethodPost, "/api/shorten_url", b)
+	s.ServeHTTP(rec, req)
+	assert.Equal(t, rec.Code, http.StatusOK)
+	l := models.TestLink(t)
+	json.NewDecoder(rec.Body).Decode(l)
+
 	testCases := []struct {
 		name         string
-		payload      interface{}
+		URL          string
 		expectedCode int
-	}{}
+	}{
+		{
+			name:         "/valid",
+			URL:          l.ShortenURL,
+			expectedCode: http.StatusMovedPermanently,
+		},
+		{
+			name:         "not valid",
+			URL:          "Google_",
+			expectedCode: http.StatusNotFound,
+		},
+		{
+			name:         "not found",
+			URL:          "y8s",
+			expectedCode: http.StatusNotFound,
+		},
+	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			rec := httptest.NewRecorder()
-			b := &bytes.Buffer{}
-			json.NewEncoder(b).Encode(tc.payload)
-			req, _ := http.NewRequest(http.MethodPost, "/api/shorten_url", b)
+			req, _ := http.NewRequest(http.MethodGet, "/"+tc.URL, nil)
 			s.ServeHTTP(rec, req)
-			assert.Equal(t, rec.Code, tc.expectedCode)
+			assert.Equal(t, tc.expectedCode, rec.Code)
 		})
 	}
 }

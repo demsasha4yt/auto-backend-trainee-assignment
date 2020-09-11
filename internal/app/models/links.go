@@ -11,10 +11,11 @@ import (
 
 // Links ...
 type Links struct {
-	ID         int64  `json:"-"`
-	URL        string `json:"url,omitempty"`
-	ShortenURL string `json:"shorten_url,omitempty"`
-	CreatedAt  string `json:"created_at,omitempty"`
+	ID             int64  `json:"-"`
+	URL            string `json:"url,omitempty"`
+	ShortenURLPath string `json:"shorten_url_path,omitempty"`
+	ShortenURL     string `json:"shorten_url,omitempty"`
+	CreatedAt      string `json:"created_at,omitempty"`
 }
 
 // Validate links
@@ -44,6 +45,6 @@ func (s *Links) MakeID() error {
 
 // PostProcessing data before respone
 func (s *Links) PostProcessing(hostname string) {
-	s.ShortenURL = hostname + s.ShortenURL
+	s.ShortenURLPath = hostname + s.ShortenURL
 	s.CreatedAt = ""
 }
