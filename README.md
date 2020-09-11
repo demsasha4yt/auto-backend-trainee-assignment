@@ -18,7 +18,8 @@ docker-compose up
 ## API
 
 #### /api/shorten_url
-* `POST` : Create a new shorten_url
+* `POST` : Создать новую короткую ссылку
+
 Запрос:
 ```
 curl --header "Content-Type: application/json" \
@@ -46,4 +47,4 @@ curl --header "Content-Type: application/json" --request GET http://192.168.99.1
 
 
 # References
-[Task definition](https://github.com/avito-tech/auto-backend-trainee-assignment)
+[Задание](https://github.com/avito-tech/auto-backend-trainee-assignment)
