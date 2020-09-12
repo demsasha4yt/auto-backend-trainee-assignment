@@ -8,6 +8,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/demsasha4yt/auto-backend-trainee-assignment/internal/app/cache/rediscache"
+
 	"github.com/demsasha4yt/auto-backend-trainee-assignment/internal/app/models"
 	"github.com/demsasha4yt/auto-backend-trainee-assignment/internal/app/store/sqlstore"
 	"github.com/stretchr/testify/assert"
@@ -20,7 +22,10 @@ var (
 func TestServer_handleShortenURL(t *testing.T) {
 	db, teardown := sqlstore.TestDB(t, databaseURL)
 	defer teardown("links")
-	s := newServer(sqlstore.New(db))
+
+	cache, teardown2 := rediscache.TestCache(t)
+	defer teardown2()
+	s := newServer(sqlstore.New(db), cache)
 
 	testCases := []struct {
 		name         string
@@ -69,7 +74,10 @@ func TestServer_handleShortenURL(t *testing.T) {
 func TestServer_handleRedirectBase62(t *testing.T) {
 	db, teardown := sqlstore.TestDB(t, databaseURL)
 	defer teardown("links")
-	s := newServer(sqlstore.New(db))
+	cache, teardown2 := rediscache.TestCache(t)
+	defer teardown2()
+
+	s := newServer(sqlstore.New(db), cache)
 
 	rec := httptest.NewRecorder()
 	b := &bytes.Buffer{}

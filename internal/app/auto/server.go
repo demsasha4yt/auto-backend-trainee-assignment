@@ -3,8 +3,10 @@ package auto
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/demsasha4yt/auto-backend-trainee-assignment/internal/app/base62"
+	"github.com/demsasha4yt/auto-backend-trainee-assignment/internal/app/cache"
 	"github.com/demsasha4yt/auto-backend-trainee-assignment/internal/app/models"
 	"github.com/demsasha4yt/auto-backend-trainee-assignment/internal/app/store"
 
@@ -29,17 +31,19 @@ type server struct {
 	logger *logrus.Logger
 	router *mux.Router
 	store  store.Store
+	cache  cache.Cache
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
 }
 
-func newServer(store store.Store) *server {
+func newServer(store store.Store, cache cache.Cache) *server {
 	s := &server{
 		logger: logrus.New(),
 		router: mux.NewRouter(),
 		store:  store,
+		cache:  cache,
 	}
 	s.configureRouter()
 	return s
@@ -78,6 +82,7 @@ func (s *server) handleShortenURL() http.HandlerFunc {
 		}
 		l.PostProcessing(currentHost)
 		s.respond(w, r, http.StatusOK, l)
+		s.cache.Set(l.ID, l.URL, time.Hour*24)
 	}
 }
 
@@ -89,11 +94,16 @@ func (s *server) handleRedirectBase62() http.HandlerFunc {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
+		if cacheData, err := s.cache.Get(id); err == nil && cacheData != "" {
+			http.Redirect(w, r, cacheData, http.StatusMovedPermanently)
+			return
+		}
 		l, err := s.store.Links().FindByID(id)
 		if err != nil {
 			s.error(w, r, http.StatusNotFound, err)
 			return
 		}
 		http.Redirect(w, r, l.URL, http.StatusMovedPermanently)
+		s.cache.Set(l.ID, l.URL, time.Hour*24)
 	}
 }
