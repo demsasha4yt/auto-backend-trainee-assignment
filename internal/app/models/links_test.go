@@ -73,7 +73,7 @@ func TestLinks_PostProcessing(t *testing.T) {
 	l.URL = "https://google.com"
 	l.ShortenURL = "q8Y"
 	l.PostProcessing(hostname)
-	assert.True(t, strings.HasPrefix(l.ShortenURL, hostname))
-	assert.True(t, strings.HasSuffix(l.ShortenURL, "q8Y"))
-	assert.Equal(t, "hostname.ru/q8Y", l.ShortenURL)
+	assert.True(t, strings.HasPrefix(l.ShortenURLFull, hostname))
+	assert.True(t, strings.HasSuffix(l.ShortenURLFull, "q8Y"))
+	assert.Equal(t, "hostname.ru/q8Y", l.ShortenURLFull)
 }

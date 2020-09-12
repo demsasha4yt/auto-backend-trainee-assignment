@@ -10,7 +10,7 @@ import (
 // TestCache returns test redis cache entity
 func TestCache(t *testing.T) (*Cache, func()) {
 	t.Helper()
-	pool := newPool("192.168.99.104:6379")
+	pool := newPool("redis:6379")
 	return New(pool, "AVITO_TEST"), func() {
 		pool.Close()
 	}
