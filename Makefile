@@ -10,6 +10,9 @@ test:
 migrate_up:
 	migrate -database "postgres://postgres:pass@db/data?sslmode=disable" -path migrations up
 
+.PHONY: run
+run: migrate_up build
+       ./auto
 
 .DEFAULT_GOAL := build
 
