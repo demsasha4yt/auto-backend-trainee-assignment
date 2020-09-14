@@ -30,7 +30,7 @@ services:
   app:
     build:
       context: ./cmd/auto
-      command: make run
+    command: make run
     volumes:
       - "./:/go/src/github.com/demsasha4yt/auto-backend-trainee-assignment"
     container_name: go_app
