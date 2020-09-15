@@ -12,7 +12,7 @@ migrate_up:
 
 .PHONY: run
 run: migrate_up build
-       ./auto
+	./auto
 
 .DEFAULT_GOAL := build
 
